@@ -1,0 +1,63 @@
+erDiagram
+    Criteria {
+        uuid id
+        daterange financial_year
+        varchar regime
+        int4range age_group_range
+        varchar user_type
+        varchar residential_status
+        varchar tax_slab
+        varchar Surcharge_slab
+    }
+
+    Criteria }|--|| Tax_rates: has
+
+    Deductions {
+        uuid id
+        varchar name
+    }
+
+    Criteria_Link_Deductions {
+        uuid criteria_id
+        uuid deductions_id
+    }
+
+    Criteria ||--o{ Criteria_Link_Deductions: linked_by
+    Criteria_Link_Deductions }o--|| Deductions: linked_by
+
+    Tax_rates {
+        uuid id
+        varchar tax_slab
+        int8range income_range
+        int tax_percentage
+    }
+
+    Rebates {
+        uuid id
+        varchar name
+    }
+
+    Criteria_Link_Rebates {
+        uuid criteria_id
+        uuid rebate_id
+    }
+
+    Criteria ||--o{ Criteria_Link_Rebates: linked_by
+    Criteria_Link_Rebates }o--|| Rebates: linked_by
+
+    Surcharge_rates {
+        uuid id
+        varchar Surcharge_slab
+        int8range income_range
+        int surchage_percentage
+    }
+
+    Criteria }|--|| Surcharge_rates: has
+
+    Cess_rates {
+        uuid id
+        int cess_rate
+        daterange financial_year
+    }
+
+    Criteria }|--|| Cess_rates: has
