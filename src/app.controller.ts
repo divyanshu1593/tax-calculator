@@ -10,4 +10,10 @@ export class AppController {
   test(@Query() infoDto: InfoDto) {
     return this.appService.calculateTotalTax(infoDto);
   }
+
+  @Get('/func')
+  func() {
+    console.log(typeof process.env.DATABASE_PASSWORD);
+    return process.env.DATABASE_PASSWORD;
+  }
 }
