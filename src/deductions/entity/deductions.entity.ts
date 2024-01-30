@@ -9,6 +9,9 @@ export class Deductions {
   @Column()
   name: string;
 
+  @Column()
+  description: string;
+
   @ManyToMany(() => Criteria, (criteria) => criteria.deductions)
   criterias: Criteria[];
 }
