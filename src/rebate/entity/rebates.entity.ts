@@ -9,6 +9,12 @@ export class Rebates {
   @Column()
   name: string;
 
+  @Column('int')
+  threshold: number;
+
+  @Column('int')
+  rebate_amount: number;
+
   @ManyToMany(() => Criteria, (criteria) => criteria.rebates)
   criterias: Criteria[];
 }

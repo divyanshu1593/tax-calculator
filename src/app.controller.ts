@@ -1,19 +1,28 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AppService } from './app.service';
-import { InfoDto } from './dto/info.dto';
+import { CriteriaDto } from './dto/criteria.dto';
+import { CriteriaRepository } from './repository/criteria.repository';
+import { Deductions } from './deductions/entity/deductions.entity';
+import { DeducitonsRepository } from './deductions/repository/deductions.repository';
+import { CriteriaTransformer } from './pipes/criteria-transformer.pipe';
 
 @Controller('/')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private criteriaRepository: CriteriaRepository,
+    private deductionsRepository: DeducitonsRepository,
+  ) {}
 
-  @Get('/')
-  test(@Query() infoDto: InfoDto) {
-    return this.appService.calculateTotalTax(infoDto);
-  }
-
-  @Get('/func')
-  func() {
-    console.log(typeof process.env.DATABASE_PASSWORD);
-    return process.env.DATABASE_PASSWORD;
+  @Get('/get-deductions')
+  @UsePipes(CriteriaTransformer, ValidationPipe)
+  getDeductions(@Query() criteriaDto: CriteriaDto): Promise<Deductions[]> {
+    return this.deductionsRepository.getDeductions(criteriaDto);
   }
 }

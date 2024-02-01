@@ -8,6 +8,8 @@ import { SurchargeModule } from './surcharge/surcharge.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Criteria } from './entity/criteria.entity';
 import { CessRates } from './entity/cess-rates.entity';
+import { CriteriaRepository } from './repository/criteria.repository';
+import { DeducitonsRepository } from './deductions/repository/deductions.repository';
 
 @Module({
   imports: [
@@ -30,6 +32,6 @@ import { CessRates } from './entity/cess-rates.entity';
     TypeOrmModule.forFeature([Criteria, CessRates]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CriteriaRepository, DeducitonsRepository],
 })
 export class AppModule {}

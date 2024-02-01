@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InfoDto } from './dto/info.dto';
 import { DeductionsService } from './deductions/deductions.service';
 import { NormalTaxService } from './normal-tax/normal-tax.service';
 import { RebateService } from './rebate/rebate.service';
@@ -14,16 +13,7 @@ export class AppService {
     private surchargeService: SurchargeService,
   ) {}
 
-  calculateTotalTax(infoDto: InfoDto) {
-    infoDto.taxableIncome =
-      infoDto.grossIncome - this.deductionsService.calculateDeductions();
-    infoDto.tax = this.normalTaxService.calculateNormalTax();
-    infoDto.tax -= this.rebateService.calculateRebate();
-    infoDto.tax += this.surchargeService.calculateSurcharge();
-    infoDto.tax = this.applyCess(infoDto.tax);
-
-    return infoDto.tax;
-  }
+  calculateTotalTax() {}
 
   applyCess(tax: number) {
     return 0.04 * tax + tax;
