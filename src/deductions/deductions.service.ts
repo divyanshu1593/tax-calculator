@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { DataDto } from 'src/dto/data.dto';
 
 @Injectable()
 export class DeductionsService {
-  calculateDeductions() {
-    return 0;
+  getTaxableIncome(dataDto: DataDto): number {
+    const { grossIncome, totalDeductions } = dataDto;
+    return grossIncome - totalDeductions;
   }
 }

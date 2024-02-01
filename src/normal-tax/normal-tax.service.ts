@@ -1,8 +1,44 @@
 import { Injectable } from '@nestjs/common';
+import { DataDto } from 'src/dto/data.dto';
+import { CriteriaRepository } from 'src/repository/criteria.repository';
 
 @Injectable()
 export class NormalTaxService {
-  calculateNormalTax() {
-    return 0;
+  constructor(private criteriaRepository: CriteriaRepository) {}
+
+  async calculateTax(dataDto: DataDto, taxableIncome: number) {
+    const slab = await this.criteriaRepository.getTaxSlabs(
+      dataDto,
+      taxableIncome,
+    );
+    let tax = 0;
+
+    for (const slabRow of slab) {
+      const [lowerBound, higherBound] = slabRow.income_range
+        .slice(1, slabRow.income_range.length - 1)
+        .split(',');
+
+      tax += this.applyTax(
+        lowerBound,
+        higherBound - 1,
+        slabRow.tax_percentage,
+        taxableIncome,
+      );
+    }
+
+    return tax;
+  }
+
+  applyTax(
+    incomeLowerBound: number,
+    incomeHigherBound: number,
+    taxPercentage: number,
+    taxableIncome: number,
+  ): number {
+    if (taxableIncome > incomeHigherBound) {
+      return ((incomeHigherBound - incomeLowerBound) * taxPercentage) / 100;
+    }
+
+    return ((taxableIncome - incomeLowerBound) * taxPercentage) / 100;
   }
 }

@@ -1,4 +1,4 @@
-import { Exclude, Type } from '@nestjs/class-transformer';
+import { Exclude } from '@nestjs/class-transformer';
 import { Criteria } from 'src/entity/criteria.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -11,11 +11,9 @@ export class Deductions {
   name: string;
 
   @Column()
-  @Exclude()
   description: string;
 
   @Exclude()
-  @Type(() => Criteria)
   @ManyToMany(() => Criteria, (criteria) => criteria.deductions)
   criterias: Criteria[];
 }
