@@ -6,6 +6,16 @@ import { SurchargeService } from './surcharge/surcharge.service';
 import { DataDto } from './dto/data.dto';
 import { CriteriaRepository } from './repository/criteria.repository';
 
+interface intermidiatoryData {
+  normalIncome: number;
+  taxableIncome: number;
+  normalTax: number;
+  taxWithSurcharge: number;
+  taxWithMarginalRelif: number;
+  taxAfterRebate: number;
+  finalTax: number;
+}
+
 @Injectable()
 export class AppService {
   constructor(
@@ -16,33 +26,45 @@ export class AppService {
     private criteriaRepository: CriteriaRepository,
   ) {}
 
-  async calculateTax(dataDto: DataDto): Promise<number> {
-    console.log('normal income', dataDto.grossIncome);
+  async calculateTax(dataDto: DataDto): Promise<any> {
     const taxableIncome = this.deductionsService.getTaxableIncome(dataDto);
-    console.log('income after deduction:', taxableIncome);
-
     let tax = await this.normalTaxService.calculateTax(dataDto, taxableIncome);
-    console.log('normal tax:', tax);
+
+    const intermidiatoryData: intermidiatoryData = {
+      normalIncome: dataDto.grossIncome,
+      taxableIncome,
+      normalTax: tax,
+      taxWithSurcharge: 0,
+      taxWithMarginalRelif: 0,
+      taxAfterRebate: 0,
+      finalTax: 0,
+    };
+
     tax += await this.surchargeService.getSurcharge(
       dataDto,
       tax,
       taxableIncome,
     );
-    console.log('tax + surcharge:', tax);
+    intermidiatoryData.taxWithSurcharge = tax;
+
     tax -= await this.surchargeService.getMarginalRelief(
       dataDto,
       tax,
       taxableIncome,
     );
-    console.log('tax + surchage - mr', tax);
+    intermidiatoryData.taxWithMarginalRelif = tax;
+
     tax -= await this.rebateService.getRabates(dataDto, taxableIncome);
     tax = Math.max(tax, 0);
-    console.log('tax after rebate', tax);
-
+    intermidiatoryData.taxAfterRebate = tax;
     tax +=
       (tax * (await this.criteriaRepository.getCessRate(dataDto)).cess_rate) /
       100;
+    intermidiatoryData.finalTax = tax;
 
-    return +tax.toFixed(2);
+    return {
+      tax: +tax.toFixed(2),
+      intermidiatoryData,
+    };
   }
 }

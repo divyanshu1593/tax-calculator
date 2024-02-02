@@ -60,7 +60,7 @@ export class SurchargeService {
 
     if (!maxIncomeWithoutSurcharge) {
       throw new BadRequestException(
-        'unable to find max income without surcharge',
+        'unable to find max income on which surcharge is not applicable',
       );
     }
 
