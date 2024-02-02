@@ -54,7 +54,7 @@ export class CriteriaRepository extends Repository<Criteria> {
       .andWhere(`regime = '${regime}'`)
       .andWhere(`user_type = '${userType}'`)
       .andWhere(`residencial_status = '${residencialStatus}'`)
-      .andWhere(`'[0, ${taxableIncome}]' @> income_range`)
+      .andWhere(`'[0, ${taxableIncome}]' && income_range`)
       .getRawMany();
 
     return data;

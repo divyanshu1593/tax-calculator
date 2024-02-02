@@ -12,11 +12,16 @@ export class NormalTaxService {
       taxableIncome,
     );
     let tax = 0;
+    console.log(slab);
 
     for (const slabRow of slab) {
       const [lowerBound, higherBound] = slabRow.income_range
         .slice(1, slabRow.income_range.length - 1)
-        .split(',');
+        .split(',')
+        .map((val: string) => {
+          if (val === '') return Infinity;
+          return +val;
+        });
 
       tax += this.applyTax(
         lowerBound,

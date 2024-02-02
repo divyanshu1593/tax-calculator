@@ -17,26 +17,32 @@ export class AppService {
   ) {}
 
   async calculateTax(dataDto: DataDto): Promise<number> {
+    console.log('normal income', dataDto.grossIncome);
     const taxableIncome = this.deductionsService.getTaxableIncome(dataDto);
+    console.log('income after deduction:', taxableIncome);
 
     let tax = await this.normalTaxService.calculateTax(dataDto, taxableIncome);
+    console.log('normal tax:', tax);
     tax += await this.surchargeService.getSurcharge(
       dataDto,
       tax,
       taxableIncome,
     );
+    console.log('tax + surcharge:', tax);
     tax -= await this.surchargeService.getMarginalRelief(
       dataDto,
       tax,
       taxableIncome,
     );
+    console.log('tax + surchage - mr', tax);
     tax -= await this.rebateService.getRabates(dataDto, taxableIncome);
     tax = Math.max(tax, 0);
+    console.log('tax after rebate', tax);
 
     tax +=
       (tax * (await this.criteriaRepository.getCessRate(dataDto)).cess_rate) /
       100;
 
-    return tax;
+    return +tax.toFixed(2);
   }
 }

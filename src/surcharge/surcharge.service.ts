@@ -20,18 +20,23 @@ export class SurchargeService {
     taxableIncome: number,
   ): Promise<number> {
     const slab = await this.criteriaRepository.getSurchargeSlabs(dataDto);
+    console.log('surcharge slab:', slab);
 
     for (const slabRow of slab) {
       const [lowerBound, higherBound] = slabRow.income_range
         .slice(1, slabRow.income_range.length - 1)
-        .split(',');
+        .split(',')
+        .map((val: string) => {
+          if (val === '') return Infinity;
+          return +val;
+        });
 
       if (taxableIncome >= lowerBound && taxableIncome < higherBound) {
         return (tax * slabRow.surcharge_percentage) / 100;
       }
     }
 
-    throw new NotFoundException();
+    throw new NotFoundException('cant find surcharge slabs for given data');
   }
 
   async getMarginalRelief(
