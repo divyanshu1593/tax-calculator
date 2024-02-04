@@ -4,17 +4,8 @@ import { NormalTaxService } from './normal-tax/normal-tax.service';
 import { RebateService } from './rebate/rebate.service';
 import { SurchargeService } from './surcharge/surcharge.service';
 import { DataDto } from './dto/data.dto';
-import { CriteriaRepository } from './repository/criteria.repository';
-
-interface intermidiatoryData {
-  normalIncome: number;
-  taxableIncome: number;
-  normalTax: number;
-  taxWithSurcharge: number;
-  taxWithMarginalRelif: number;
-  taxAfterRebate: number;
-  finalTax: number;
-}
+import { CriteriaRepository } from './database/repository/criteria.repository';
+import { intermidiatoryData } from './interfaces/intermidiatory-data.interface';
 
 @Injectable()
 export class AppService {
@@ -26,7 +17,7 @@ export class AppService {
     private criteriaRepository: CriteriaRepository,
   ) {}
 
-  async calculateTax(dataDto: DataDto): Promise<any> {
+  async calculateTax(dataDto: DataDto): Promise<intermidiatoryData> {
     const taxableIncome = this.deductionsService.getTaxableIncome(dataDto);
     let tax = await this.normalTaxService.calculateTax(dataDto, taxableIncome);
 
@@ -62,9 +53,6 @@ export class AppService {
       100;
     intermidiatoryData.finalTax = tax;
 
-    return {
-      tax: +tax.toFixed(2),
-      intermidiatoryData,
-    };
+    return intermidiatoryData;
   }
 }

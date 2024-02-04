@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DeductionsService } from './deductions.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Deductions } from './entity/deductions.entity';
+import { Deductions } from '../database/entity/deductions.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Deductions])],

@@ -8,6 +8,9 @@ export class CessRates {
   @Column('int')
   cess_rate: number;
 
-  @Column('daterange')
-  financial_year: string;
+  @Column('date')
+  financial_year_start: Date;
+
+  @Column('date')
+  financial_year_end: Date;
 }

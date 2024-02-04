@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { DataDto } from 'src/dto/data.dto';
 import { NormalTaxService } from 'src/normal-tax/normal-tax.service';
-import { CriteriaRepository } from 'src/repository/criteria.repository';
+import { CriteriaRepository } from 'src/database/repository/criteria.repository';
 
 @Injectable()
 export class SurchargeService {

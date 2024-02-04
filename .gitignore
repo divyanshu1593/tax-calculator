@@ -5,6 +5,9 @@
 # environment variable file
 .env
 
+# todo file
+todo
+
 # Logs
 logs
 *.log

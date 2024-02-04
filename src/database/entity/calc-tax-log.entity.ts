@@ -5,11 +5,14 @@ export class CalcTaxLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('varchar')
-  timestamp: number;
+  @Column('timestamp')
+  datetime: Date;
 
-  @Column()
-  financialYear: string;
+  @Column('date')
+  financialYearStart: Date;
+
+  @Column('date')
+  financialYearEnd: Date;
 
   @Column()
   regime: string;

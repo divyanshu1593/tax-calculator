@@ -1,4 +1,4 @@
-import { Criteria } from 'src/entity/criteria.entity';
+import { Criteria } from 'src/database/entity/criteria.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

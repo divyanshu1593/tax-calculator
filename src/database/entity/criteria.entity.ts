@@ -1,5 +1,5 @@
-import { Deductions } from 'src/deductions/entity/deductions.entity';
-import { Rebates } from 'src/rebate/entity/rebates.entity';
+import { Deductions } from 'src/database/entity/deductions.entity';
+import { Rebates } from 'src/database/entity/rebates.entity';
 import {
   Column,
   Entity,
@@ -13,8 +13,11 @@ export class Criteria {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('daterange')
-  financial_year: string;
+  @Column('date')
+  financial_year_start: Date;
+
+  @Column('date')
+  financial_year_end: Date;
 
   @Column()
   regime: string;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DataDto } from 'src/dto/data.dto';
-import { Criteria } from 'src/entity/criteria.entity';
+import { Criteria } from 'src/database/entity/criteria.entity';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
@@ -10,7 +10,14 @@ export class CriteriaRepository extends Repository<Criteria> {
   }
 
   async getSurchargeSlabs(dataDto: DataDto) {
-    const { age, financialYear, regime, userType, residencialStatus } = dataDto;
+    const {
+      age,
+      financialYearStart,
+      financialYearEnd,
+      regime,
+      userType,
+      residencialStatus,
+    } = dataDto;
 
     const data = await this.createQueryBuilder('criteria')
       .select([
@@ -25,7 +32,8 @@ export class CriteriaRepository extends Repository<Criteria> {
         'criteria.surchargeSlab = surcharge_rates.surcharge_slab',
       )
       .where(`criteria.age_group_range @> ${age}`)
-      .andWhere(`financial_year = '${financialYear}'`)
+      .andWhere(`financial_year_start = '${financialYearStart}'`)
+      .andWhere(`financial_year_end = '${financialYearEnd}'`)
       .andWhere(`regime = '${regime}'`)
       .andWhere(`user_type = '${userType}'`)
       .andWhere(`residencial_status = '${residencialStatus}'`)
@@ -35,7 +43,14 @@ export class CriteriaRepository extends Repository<Criteria> {
   }
 
   async getTaxSlabs(dataDto: DataDto, taxableIncome: number) {
-    const { age, financialYear, regime, userType, residencialStatus } = dataDto;
+    const {
+      age,
+      financialYearStart,
+      financialYearEnd,
+      regime,
+      userType,
+      residencialStatus,
+    } = dataDto;
 
     const data = await this.createQueryBuilder('criteria')
       .select([
@@ -50,7 +65,8 @@ export class CriteriaRepository extends Repository<Criteria> {
         'criteria.taxSlab = tax_rates.tax_slab',
       )
       .where(`criteria.age_group_range @> ${age}`)
-      .andWhere(`financial_year = '${financialYear}'`)
+      .andWhere(`financial_year_start = '${financialYearStart}'`)
+      .andWhere(`financial_year_end = '${financialYearEnd}'`)
       .andWhere(`regime = '${regime}'`)
       .andWhere(`user_type = '${userType}'`)
       .andWhere(`residencial_status = '${residencialStatus}'`)
@@ -61,13 +77,21 @@ export class CriteriaRepository extends Repository<Criteria> {
   }
 
   async getRebate(dataDto: DataDto) {
-    const { age, financialYear, regime, userType, residencialStatus } = dataDto;
+    const {
+      age,
+      financialYearStart,
+      financialYearEnd,
+      regime,
+      userType,
+      residencialStatus,
+    } = dataDto;
 
     const data = await this.createQueryBuilder('criteria')
       .select(['rebate_amount', 'rebate_amount', 'threshold', 'threshold'])
       .innerJoin('criteria.rebates', 'rebates')
       .where(`criteria.age_group_range @> ${age}`)
-      .andWhere(`financial_year = '${financialYear}'`)
+      .andWhere(`financial_year_start = '${financialYearStart}'`)
+      .andWhere(`financial_year_end = '${financialYearEnd}'`)
       .andWhere(`regime = '${regime}'`)
       .andWhere(`user_type = '${userType}'`)
       .andWhere(`residencial_status = '${residencialStatus}'`)
@@ -77,23 +101,27 @@ export class CriteriaRepository extends Repository<Criteria> {
   }
 
   async getCessRate(dataDto: DataDto) {
-    const { financialYear } = dataDto;
+    const { financialYearStart, financialYearEnd } = dataDto;
 
     const cessRate = await this.createQueryBuilder('criteria')
       .select([
-        'criteria.financial_year',
-        'criteria.financial_year',
+        'criteria.financial_year_start',
+        'criteria.financial_year_start',
+        'criteria.financial_year_end',
+        'criteria.financial_year_end',
         'cess_rate',
         'cess_rate',
       ])
       .innerJoin(
         'cess_rates',
         'cess_rates',
-        'criteria.financial_year = cess_rates.financial_year',
+        'criteria.financial_year_start = cess_rates.financial_year_start AND criteria.financial_year_end = cess_rates.financial_year_end',
       )
-      .where(`criteria.financial_year = '${financialYear}'`)
-      .groupBy('criteria.financial_year')
+      .where(`criteria.financial_year_start = '${financialYearStart}'`)
+      .andWhere(`criteria.financial_year_end = '${financialYearEnd}'`)
+      .groupBy('criteria.financial_year_start')
       .addGroupBy('cess_rate')
+      .addGroupBy('criteria.financial_year_end')
       .getRawOne();
 
     return cessRate;

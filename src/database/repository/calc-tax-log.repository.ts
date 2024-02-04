@@ -1,26 +1,9 @@
 import { DataSource, InsertResult, Repository } from 'typeorm';
-import { CalcTaxLog } from './calc-tax-log.entity';
+import { CalcTaxLog } from '../entity/calc-tax-log.entity';
 import { Injectable } from '@nestjs/common';
-
-interface reqParamInterface {
-  financialYear: string;
-  regime: string;
-  age: string;
-  residencialStatus: string;
-  userType: string;
-  grossIncome: string;
-  totalDeductions: string;
-}
-
-interface IntermidiatoryData {
-  normalIncome: number;
-  taxableIncome: number;
-  normalTax: number;
-  taxWithSurcharge: number;
-  taxWithMarginalRelif: number;
-  taxAfterRebate: number;
-  finalTax: number;
-}
+import { intermidiatoryData } from 'src/interfaces/intermidiatory-data.interface';
+import { reqParamInterface } from 'src/interfaces/req-param.interface';
+import { GetLogDto } from 'src/dto/get-log.dto';
 
 @Injectable()
 export class CalcTaxLogRepository extends Repository<CalcTaxLog> {
@@ -29,11 +12,12 @@ export class CalcTaxLogRepository extends Repository<CalcTaxLog> {
   }
 
   async logInput(
-    timestamp: number,
+    date: Date,
     reqParams: reqParamInterface,
   ): Promise<InsertResult> {
     const {
-      financialYear,
+      financialYearStart,
+      financialYearEnd,
       regime,
       age,
       residencialStatus,
@@ -43,8 +27,9 @@ export class CalcTaxLogRepository extends Repository<CalcTaxLog> {
     } = reqParams;
 
     const result = await this.insert({
-      timestamp,
-      financialYear,
+      datetime: date,
+      financialYearStart,
+      financialYearEnd,
       age: +age,
       residencialStatus,
       regime,
@@ -63,13 +48,22 @@ export class CalcTaxLogRepository extends Repository<CalcTaxLog> {
     return result;
   }
 
-  async insertTaxes(timestamp: number, intermidiatoryData: IntermidiatoryData) {
+  async insertTaxes(date: Date, intermidiatoryData: intermidiatoryData) {
     await this.createQueryBuilder('getDeducitonsLog')
       .update()
       .set(intermidiatoryData)
       .where({
-        timestamp,
+        datetime: date,
       })
       .execute();
+  }
+
+  async getCalcTaxLog(getLogDto: GetLogDto) {
+    const { start, end } = getLogDto;
+
+    return await this.createQueryBuilder('calcTaxLog')
+      .select()
+      .where(`calcTaxLog.datetime between '${start}' and '${end}'`)
+      .getMany();
   }
 }

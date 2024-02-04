@@ -6,10 +6,10 @@ import { NormalTaxModule } from './normal-tax/normal-tax.module';
 import { RebateModule } from './rebate/rebate.module';
 import { SurchargeModule } from './surcharge/surcharge.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Criteria } from './entity/criteria.entity';
-import { CessRates } from './entity/cess-rates.entity';
-import { CriteriaRepository } from './repository/criteria.repository';
-import { DeducitonsRepository } from './deductions/repository/deductions.repository';
+import { Criteria } from './database/entity/criteria.entity';
+import { CessRates } from './database/entity/cess-rates.entity';
+import { CriteriaRepository } from './database/repository/criteria.repository';
+import { DeducitonsRepository } from './database/repository/deductions.repository';
 import { LoggerModule } from './logger/logger.module';
 
 @Module({

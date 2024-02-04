@@ -10,8 +10,14 @@ export class DeducitonsRepository extends Repository<Deductions> {
   }
 
   async getDeductions(criteriaDto: CriteriaDto): Promise<Deductions[]> {
-    const { financialYear, regime, age, residencialStatus, userType } =
-      criteriaDto;
+    const {
+      financialYearStart,
+      financialYearEnd,
+      regime,
+      age,
+      residencialStatus,
+      userType,
+    } = criteriaDto;
 
     return await this.createQueryBuilder('deductions')
       .innerJoinAndSelect('deductions.criterias', 'criterias')
@@ -19,7 +25,8 @@ export class DeducitonsRepository extends Repository<Deductions> {
       .andWhere(`criterias.user_type = '${userType}'`)
       .andWhere(`criterias.regime = '${regime}'`)
       .andWhere(`criterias.residencial_status = '${residencialStatus}'`)
-      .andWhere(`criterias.financial_year = '${financialYear}'`)
+      .andWhere(`criterias.financial_year_start = '${financialYearStart}'`)
+      .andWhere(`criterias.financial_year_end = '${financialYearEnd}'`)
       .getMany();
   }
 }

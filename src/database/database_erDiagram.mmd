@@ -1,7 +1,8 @@
 erDiagram
     Criteria {
         uuid id
-        daterange financial_year
+        date financial_year_start
+        date financial_year_end
         varchar regime
         int4range age_group_range
         varchar user_type
@@ -60,7 +61,8 @@ erDiagram
     Cess_rates {
         uuid id
         int cess_rate
-        daterange financial_year
+        date financial_year_start
+        date financial_year_end
     }
 
     Criteria }|--|| Cess_rates: has

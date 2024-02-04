@@ -1,39 +1,57 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UseInterceptors,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { CriteriaDto } from './dto/criteria.dto';
-import { Deductions } from './deductions/entity/deductions.entity';
-import { DeducitonsRepository } from './deductions/repository/deductions.repository';
-import { CriteriaTransformer } from './pipes/criteria-transformer.pipe';
+import { Deductions } from './database/entity/deductions.entity';
+import { DeducitonsRepository } from './database/repository/deductions.repository';
 import { DataDto } from './dto/data.dto';
-import { DataTransformer } from './pipes/data-transformer.pipe';
-import { GetDeductionsLogger } from './logger/getDeductionsLogger/get-deductions-logger.interceptor';
-import { CalcTaxLogger } from './logger/calculateTaxLogger/calc-tax-logger.interceptor';
+import { GetDeductionsLogger } from './logger/get-deductions-logger.interceptor';
+import { CalcTaxLogger } from './logger/calc-tax-logger.interceptor';
+import { CustomResponse } from './interfaces/response.interface';
+import { intermidiatoryData } from './interfaces/intermidiatory-data.interface';
+import { GetLogDto } from './dto/get-log.dto';
+import { GetDeductionsLogRepository } from './database/repository/get-deductions-log.repository';
+import { CalcTaxLogRepository } from './database/repository/calc-tax-log.repository';
 
 @Controller('/')
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private deductionsRepository: DeducitonsRepository,
+    private getDeductionsLogRepository: GetDeductionsLogRepository,
+    private calcTaxLogRepository: CalcTaxLogRepository,
   ) {}
 
   @Get('/get-deductions')
-  @UsePipes(CriteriaTransformer, ValidationPipe)
   @UseInterceptors(GetDeductionsLogger)
-  getDeductions(@Query() criteriaDto: CriteriaDto): Promise<Deductions[]> {
-    return this.deductionsRepository.getDeductions(criteriaDto);
+  async getDeductions(
+    @Query() criteriaDto: CriteriaDto,
+  ): Promise<CustomResponse<Deductions[]>> {
+    return {
+      isError: false,
+      message: '',
+      data: await this.deductionsRepository.getDeductions(criteriaDto),
+    };
   }
 
   @Get('/calc-tax')
-  @UsePipes(DataTransformer, ValidationPipe)
   @UseInterceptors(CalcTaxLogger)
-  calculateTax(@Query() dataDto: DataDto) {
-    return this.appService.calculateTax(dataDto);
+  async calculateTax(
+    @Query() dataDto: DataDto,
+  ): Promise<CustomResponse<intermidiatoryData>> {
+    return {
+      isError: false,
+      message: '',
+      data: await this.appService.calculateTax(dataDto),
+    };
+  }
+
+  @Get('/get-deductions-log')
+  getDeductionslogs(@Query() getLogDto: GetLogDto) {
+    return this.getDeductionsLogRepository.getDeducitonsLog(getLogDto);
+  }
+
+  @Get('/get-calc-tax-log')
+  getCalcTaxlogs(@Query() getLogDto: GetLogDto) {
+    return this.calcTaxLogRepository.getCalcTaxLog(getLogDto);
   }
 }

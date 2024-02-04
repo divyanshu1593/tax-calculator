@@ -1,14 +1,8 @@
 import { DataSource, InsertResult, Repository } from 'typeorm';
-import { GetDeductionsLog } from './get-deductions-log.entity';
+import { GetDeductionsLog } from '../entity/get-deductions-log.entity';
 import { Injectable } from '@nestjs/common';
-
-interface reqParamInterface {
-  financialYear: string;
-  regime: string;
-  age: string;
-  residencialStatus: string;
-  userType: string;
-}
+import { reqParamInterface } from 'src/interfaces/req-param.interface';
+import { GetLogDto } from 'src/dto/get-log.dto';
 
 @Injectable()
 export class GetDeductionsLogRepository extends Repository<GetDeductionsLog> {
@@ -17,15 +11,22 @@ export class GetDeductionsLogRepository extends Repository<GetDeductionsLog> {
   }
 
   async logInput(
-    timestamp: number,
+    date: Date,
     reqParams: reqParamInterface,
   ): Promise<InsertResult> {
-    const { financialYear, regime, age, residencialStatus, userType } =
-      reqParams;
+    const {
+      financialYearStart,
+      financialYearEnd,
+      regime,
+      age,
+      residencialStatus,
+      userType,
+    } = reqParams;
 
     const result = await this.insert({
-      timestamp,
-      financialYear,
+      datetime: date,
+      financialYearStart,
+      financialYearEnd,
       regime,
       age: +age,
       residencialStatus,
@@ -37,7 +38,7 @@ export class GetDeductionsLogRepository extends Repository<GetDeductionsLog> {
     return result;
   }
 
-  async insertDeductions(timestamp: number, name: string, description: string) {
+  async insertDeductions(date: Date, name: string, description: string) {
     await this.createQueryBuilder('getDeducitonsLog')
       .update()
       .set({
@@ -46,8 +47,17 @@ export class GetDeductionsLogRepository extends Repository<GetDeductionsLog> {
           `array_append("dedeuctionDescription", '${description}')`,
       })
       .where({
-        timestamp,
+        datetime: date,
       })
       .execute();
+  }
+
+  async getDeducitonsLog(getLogDto: GetLogDto) {
+    const { start, end } = getLogDto;
+
+    return await this.createQueryBuilder('getDeductionsLog')
+      .select()
+      .where(`getDeductionsLog.datetime between '${start}' and '${end}'`)
+      .getMany();
   }
 }

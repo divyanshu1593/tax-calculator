@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DataDto } from 'src/dto/data.dto';
-import { CriteriaRepository } from 'src/repository/criteria.repository';
+import { CriteriaRepository } from 'src/database/repository/criteria.repository';
 
 @Injectable()
 export class NormalTaxService {
