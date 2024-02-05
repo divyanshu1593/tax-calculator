@@ -11,6 +11,7 @@ import { CessRates } from './database/entity/cess-rates.entity';
 import { CriteriaRepository } from './database/repository/criteria.repository';
 import { DeducitonsRepository } from './database/repository/deductions.repository';
 import { LoggerModule } from './logger/logger.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { LoggerModule } from './logger/logger.module';
     }),
     TypeOrmModule.forFeature([Criteria, CessRates]),
     LoggerModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, CriteriaRepository, DeducitonsRepository],
